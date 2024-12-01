@@ -31,4 +31,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
+    public function ticker_user() {
+        return $this->hasMany(Ticket::class, 'user_id', 'id');
+    }
 }
