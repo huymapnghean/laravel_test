@@ -10,15 +10,17 @@ class LoginRequest extends FormRequest {
     }
     public function rules() {
         return [
-            'email' => 'required',
-            'password' => 'required'
+            'email' => 'required|email',
+            'password' => 'required|min:8',
         ];
     }
 
     public function messages() {
         return [
-            'email.required' => 'Vui lòng nhập email',
-            'password.required' => 'Vui lòng nhập password'
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email phải có định dạng hợp lệ (bao gồm dấu @).',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
         ];
     }
 }
