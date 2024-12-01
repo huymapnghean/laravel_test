@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
     public function login(LoginRequest $request) {
-//        $dataLogin = User::query()
-//            ->where('email', $request['email'])
-//            ->where('password', $request['password'])
-//            ->first();
-
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
@@ -30,15 +25,33 @@ class AuthController extends Controller {
 
         return response()->json(['message' => 'Thông tin đăng nhập không chính xác'], 401);
 
-//        $user = User::create([
-//            'email' => $request['email'],
-//            'password' => Hash::make($request['password']), // Mã hóa mật khẩu
-//        ]);
-//
-//        return response()->json([
-//            'message' => 'Người dùng đã được tạo thành công!',
-//            'user' => $user,
-//        ], 201);
+    }
 
+    public function register(LoginRequest $request) {
+        $user = User::create([
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+        ]);
+
+        return response()->json([
+            'message' => 'Người dùng đã được tạo thành công!',
+            'user' => $user,
+        ], 201);
+    }
+
+    public function updatePassword(LoginRequest $request) {
+        $user = User::where('email', $request['email'])->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Người dùng không tồn tại!'
+            ], 404);
+        }
+        $user->password = Hash::make($request['password']);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Mật khẩu đã được cập nhật thành công!',
+            'user' => $user,
+        ], 200);
     }
 }
