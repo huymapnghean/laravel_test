@@ -43,6 +43,10 @@ class TicketController extends Controller {
     }
 
     public function updateTicket(UpdateTicketRequest $request, $id) {
+//        $ticket = Ticket::find($id);
+//        if(!Gate::allows('update-ticket-role', $ticket)) {
+//            return response()->json(['message' => 'Unauthorized'], 403);
+//        }
         return $this->service->updateTicket($id, $request);
     }
 
