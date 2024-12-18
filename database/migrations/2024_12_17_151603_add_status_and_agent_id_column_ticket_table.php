@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTicketLabel extends Migration
+class AddStatusAndAgentIdColumnTicketTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateTicketLabel extends Migration
      */
     public function up()
     {
-        Schema::create('ticket_label', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('ticket', function (Blueprint $table) {
+            $table->string('status')->nullable();
+            $table->bigInteger('agent_id')->nullable();
         });
     }
 
@@ -27,6 +26,8 @@ class CreateTicketLabel extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ticket_label');
+        Schema::table('ticket', function (Blueprint $table) {
+            $table->dropColumn(['status', 'agent_id']);
+        });
     }
 }
