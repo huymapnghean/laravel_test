@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Ticket;
+use App\Policies\DataTicketPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+//        Ticket::class => DataTicketPolicy::class,
     ];
 
     /**
@@ -23,8 +25,14 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPolicies();
+//        $this->registerPolicies();
 
-        //
+//        Gate::define('update-ticket', function ($agent_id, $ticketId) {
+//            dd(123);
+//            return true;
+//            dd($agent_id);
+//            $ticket = Ticket::find($ticketId);
+//            return $agent_id === $ticket->agent_id;
+//        });
     }
 }

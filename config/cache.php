@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use Illuminate\Support\Str;
 
@@ -106,5 +106,7 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
+
+    'jwt_secret' => env('JWT_SECRET'),
 
 ];

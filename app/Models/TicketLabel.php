@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TickerLabel extends Model {
-    protected $table = 'ticker_label';
+class TicketLabel extends Model {
+    protected $table = 'ticket_label';
 
     protected $fillable = ['id', 'name'];
 
