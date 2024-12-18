@@ -31,8 +31,15 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey(); // thông thường là khóa chính của người dùng (ID)
+    }
 
-    public function ticker_user() {
-        return $this->hasMany(Ticket::class, 'user_id', 'id');
+    public function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
     }
 }
