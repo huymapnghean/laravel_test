@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTicketLabel extends Migration
+class CreateUserDetailTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateTicketLabel extends Migration
      */
     public function up()
     {
-        Schema::create('ticket_label', function (Blueprint $table) {
+        Schema::create('user_detail', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->integer('age');
+            $table->integer('role');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateTicketLabel extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ticket_label');
+        Schema::dropIfExists('user_detail');
     }
 }
