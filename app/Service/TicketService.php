@@ -91,74 +91,80 @@ class TicketService {
 
     public function updateTicket($id, $req) {
         $payload = $req->attributes->get('jwt_payload');
-        $data = $req->all();
 
-        $dataUpdate['title'] = $data['title'];
-        $dataUpdate['status'] = $data['status'];
-        $dataUpdate['message'] = $data['message'];
-        $dataUpdate['priority'] = intval($data['priority']);
-        $dataUpdate['updated_at'] = date('Y-m-d H:i:s');
+        if ($payload['role'] === UserDetail::AGENT && $payload['sub'] !== Ticket::query()->where('id', $id)->first()->agent_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        } else {
+            $data = $req->all();
 
-        $affectedRows = Ticket::query()->where('id', $id)->update($dataUpdate);
 
-        if ($affectedRows) {
-            $existingLabels = TableTicketLabel::query()
-                ->where('ticket_id', $id)
-                ->pluck('label_id')
-                ->toArray();
+            $dataUpdate['title'] = $data['title'];
+            $dataUpdate['status'] = $data['status'];
+            $dataUpdate['message'] = $data['message'];
+            $dataUpdate['priority'] = intval($data['priority']);
+            $dataUpdate['updated_at'] = date('Y-m-d H:i:s');
 
-            $newLabels = $data['label'];
+            $affectedRows = Ticket::query()->where('id', $id)->update($dataUpdate);
 
-            $labelsToAdd = array_diff($newLabels, $existingLabels);
-            $labelsToRemove = array_diff($existingLabels, $newLabels);
-
-            foreach ($labelsToAdd as $label) {
-                TableTicketLabel::query()->insert([
-                    'label_id' => $label,
-                    'ticket_id' => $id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
-            }
-
-            if (!empty($labelsToRemove)) {
-                TableTicketLabel::query()
+            if ($affectedRows) {
+                $existingLabels = TableTicketLabel::query()
                     ->where('ticket_id', $id)
-                    ->whereIn('label_id', $labelsToRemove)
-                    ->delete();
-            }
+                    ->pluck('label_id')
+                    ->toArray();
 
-            $existingCategories = TableTicketCategory::query()
-                ->where('ticket_id', $id)
-                ->pluck('category_id')
-                ->toArray();
+                $newLabels = $data['label'];
 
-            $newCategories = $data['category'];
+                $labelsToAdd = array_diff($newLabels, $existingLabels);
+                $labelsToRemove = array_diff($existingLabels, $newLabels);
 
-            $categoriesToAdd = array_diff($newCategories, $existingCategories);
-            $categoriesToRemove = array_diff($existingCategories, $newCategories);
-
-            if (!empty($categoriesToAdd)) {
-                $insertData = [];
-                foreach ($categoriesToAdd as $category) {
-                    $insertData[] = [
-                        'category_id' => $category,
+                foreach ($labelsToAdd as $label) {
+                    TableTicketLabel::query()->insert([
+                        'label_id' => $label,
                         'ticket_id' => $id,
                         'created_at' => date('Y-m-d H:i:s'),
-                    ];
+                    ]);
                 }
-                TableTicketCategory::query()->insert($insertData);
-            }
 
-            if (!empty($categoriesToRemove)) {
-                TableTicketCategory::query()
+                if (!empty($labelsToRemove)) {
+                    TableTicketLabel::query()
+                        ->where('ticket_id', $id)
+                        ->whereIn('label_id', $labelsToRemove)
+                        ->delete();
+                }
+
+                $existingCategories = TableTicketCategory::query()
                     ->where('ticket_id', $id)
-                    ->whereIn('category_id', $categoriesToRemove)
-                    ->delete();
-            }
+                    ->pluck('category_id')
+                    ->toArray();
 
-            return response()->json(['message' => 'Ticket and labels updated successfully']);
-        } else {
-            return response()->json(['message' => 'No changes were made or Ticket not found'], 404);
+                $newCategories = $data['category'];
+
+                $categoriesToAdd = array_diff($newCategories, $existingCategories);
+                $categoriesToRemove = array_diff($existingCategories, $newCategories);
+
+                if (!empty($categoriesToAdd)) {
+                    $insertData = [];
+                    foreach ($categoriesToAdd as $category) {
+                        $insertData[] = [
+                            'category_id' => $category,
+                            'ticket_id' => $id,
+                            'created_at' => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                    TableTicketCategory::query()->insert($insertData);
+                }
+
+                if (!empty($categoriesToRemove)) {
+                    TableTicketCategory::query()
+                        ->where('ticket_id', $id)
+                        ->whereIn('category_id', $categoriesToRemove)
+                        ->delete();
+                }
+
+                return response()->json(['message' => 'Ticket and labels updated successfully']);
+            } else {
+                return response()->json(['message' => 'No changes were made or Ticket not found'], 404);
+            }
         }
     }
 
